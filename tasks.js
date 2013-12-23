@@ -14,7 +14,7 @@ var thisPage = function() {
 
   // prime the system
   function init() {
-    makeRequest(g.listUrl,'list');
+    makeRequest(g.listUrl,'read');
   }
 
   /* parse the response */
@@ -89,15 +89,15 @@ var thisPage = function() {
       if(inp) {
         data = elm.getAttribute('data')+'='+encodeURIComponent(inp);
         if(elm.getAttribute('method')==='get') {
-          makeRequest(elm.getAttribute('href')+'?'+data, elm.id);        
+          makeRequest(elm.getAttribute('href')+'?'+data, 'read');        
         }
         else {
-          makeRequest(elm.getAttribute('href'), elm.id, data)
+          makeRequest(elm.getAttribute('href'), 'write', data)
         }    
       }
     }
     else {
-      makeRequest(elm.getAttribute('href'), elm.id);        
+      makeRequest(elm.getAttribute('href'), 'read');        
     }
   }
 
@@ -125,14 +125,12 @@ var thisPage = function() {
     if(ajax.readyState==4 || ajax.readyState==='complete') {
       if(ajax.status===200 || ajax.status===204) {
         switch(context) {
-          case 'list':
-          case 'search':
+          case 'read':
             g.msg = JSON.parse(ajax.responseText);
             showResponse();
             break;
-          case 'add':
-          case 'complete':
-            makeRequest(g.listUrl, 'list');
+          case 'write':
+            makeRequest(g.listUrl, 'read');
             break;
           default:
             alert('unknown context:'+context);
