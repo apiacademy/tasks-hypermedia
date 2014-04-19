@@ -10,6 +10,8 @@ var thisPage = function() {
 
   var g = {};
   g.msg = {};
+  
+  // memorize a single URL
   g.listUrl = '/tasks/';
 
   // prime the system
@@ -39,6 +41,7 @@ var thisPage = function() {
             li.id = g.msg.collection[i].link.rel;
             li.setAttribute('href', g.msg.collection[i].link.href);
             li.setAttribute('method', g.msg.collection[i].link.method);
+            li.setAttribute('title','click to delete');
             li.onclick = clickButton;
           }
         }

@@ -10,17 +10,17 @@ g.port = (process.env.PORT ? process.env.PORT : 8484);
 
 /* internal test data */
 g.list = [];
-g.list[0] = {id:0,text:'this is some item',link:{rel:'complete',href:'/tasks/complete/',method:'post',data:[{name:'id'}]}};
-g.list[1] = {id:1,text:'this is another item',link:{rel:'complete',href:'/tasks/complete/',method:'post',data:[{name:'id'}]}};
-g.list[2] = {id:2,text:'this is one more item',link:{rel:'complete',href:'/tasks/complete/',method:'post',data:[{name:'id'}]}};
-g.list[3] = {id:3,text:'this is possibly an item',link:{rel:'complete',href:'/tasks/complete/',method:'post',data:[{name:'id'}]}};
+g.list[0] = {id:0,text:'this is some item'};
+g.list[1] = {id:1,text:'this is another item'};
+g.list[2] = {id:2,text:'this is one more item'};
+g.list[3] = {id:3,text:'this is possibly an item'};
 
 // main entry point
 function handler(req, res) {
 
   var m = {};
   m.item = {};
-  m.search = '';
+  m.filter = '';
   
   // internal urls
   m.homeUrl = '/';
@@ -33,14 +33,6 @@ function handler(req, res) {
   m.appJson  = {'content-type':'application/json'};
   m.textHtml = {'content-type':'text/html'};
   m.appJS = {'content-type':'application/javascript'};
-
-  // add support for CORS
-  var headers = {
-    'Content-Type' : 'application/json',
-    'Access-Control-Allow-Origin' : '*',
-    'Access-Control-Allow-Methods' : '*',
-    'Access-Control-Allow-Headers' : '*'
-  };
 
   // hypermedia controls
   m.errorMessage = '{"error":"{@status}", "message":"{@msg}"}';
@@ -66,7 +58,7 @@ function handler(req, res) {
     // check for a search query
     if(req.url.indexOf(m.searchUrl)!==-1) {
       url = m.searchUrl;
-      m.search = req.url.substring(m.searchUrl.length,255).replace('?text=','');
+      m.filter = req.url.substring(m.searchUrl.length,255).replace('?text=','');
     }
     else {
       url = req.url;
@@ -146,11 +138,18 @@ function handler(req, res) {
  
   */
   function sendList() {
-    var msg;
+    var msg,x,i,coll;
 
     msg = {};
-    msg.links =[];
-    msg.collection = g.list;
+    msg.links = [];
+    msg.collection = [];
+
+    coll = [];
+    for(i=0,x=g.list.length;i<x;i++) {
+      coll[i] = g.list[i];
+      coll[i].link = m.completeControl;
+    }
+    msg.collection = coll;
 
     msg.links.push(m.addControl);
 
@@ -170,19 +169,26 @@ function handler(req, res) {
 
   */
   function searchList() {
-    var search, i, x, msg;
+    var filter, i, x, msg, coll;
 
-    search = [];
+    filter = [];
     for(i=0,x=g.list.length;i<x;i++) {
-      if(g.list[i].text.indexOf(m.search)!==-1) {
-        search.push(g.list[i]);
+      if(g.list[i].text.indexOf(m.filter)!==-1) {
+        filter.push(g.list[i]);
       }
     }
 
     msg = {};
-    msg.links =[];
-    msg.collection = search;
-
+    msg.links = [];
+    msg.collection = [];
+    
+    coll = [];
+    for(i=0,x=filter.length;i<x;i++) {
+      coll[i] = filter[i];
+      coll[i].link = m.completeControl;
+    }
+    msg.collection = coll;
+    
     msg.links.push(m.addControl);
     msg.links.push(m.listControl);
 
